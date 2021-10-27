@@ -16,6 +16,11 @@ PR_OWNER_NUMBER=$(gh pr view --json url | jq -r .url | sed 's@https://github.com
 PR_NUMBER=$(echo $PR_OWNER_NUMBER | sed 's@.*#@@')
 AUTHOR=$(gh pr view --json author | jq -r .author.login)
 
+# Add github-pr-owner-number
+if [[ -n "$PR_OWNER_NUMBER" ]]; then
+    trace git config "branch.$CURRENT_BRANCH.github-pr-owner-number" "$PR_OWNER_NUMBER"
+fi
+
 # Add named remote
 if git config "branch.$CURRENT_BRANCH.remote" | grep -q '^https://github.com\|^git@github.com'; then
     trace git remote add "$AUTHOR" "$(git config branch.$CURRENT_BRANCH.remote)"
