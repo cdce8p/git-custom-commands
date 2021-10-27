@@ -40,4 +40,5 @@ HEAD=$(git config branch.$CURRENT_BRANCH.merge | sed 's@refs/heads/@@')
 
 if [[ $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
     trace git fetch "$AUTHOR" "$HEAD"
+    trace git merge --ff-only
 fi
