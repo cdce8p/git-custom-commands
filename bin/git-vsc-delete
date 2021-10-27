@@ -1,0 +1,30 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# Licensed under the MIT License. See LICENSE file for license information.
+# ---------------------------------------------------------------------------
+
+
+trace() {
+  printf "\033[33m%s\033[0m %s\n" "$1" "${*:2}"
+  "$@"
+}
+
+CURRENT_BRANCH=$(git branch --show-current)
+REMOTE=$(git config "branch.$CURRENT_BRANCH.remote")
+
+ALL_BRANCHES_REMOTE=$(git config --get-regex 'branch\..*\.remote')
+MAIN_BRANCH=$(echo $ALL_BRANCHES_REMOTE | sed 's@branch\.@@; s@\..*@@')
+
+if [[ $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
+  if [[ $(git switch $MAIN_BRANCH) ]]; then
+    trace git branch -D "$CURRENT_BRANCH"
+    ALL_BRANCHES_REMOTE=$(git config --get-regex 'branch\..*\.remote')
+    if [[ ! $(git config --get-regex 'branch\..*\.remote' | grep "$REMOTE") ]]; then
+      trace git remote remove "$REMOTE"
+    fi
+  else
+    printf "Error: Couldn't switch to $MAIN_BRANCH\n"
+  fi
+else
+  printf "Error: Branch doesn't start with 'pr/../'\n"
+fi

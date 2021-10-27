@@ -1,0 +1,36 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# Licensed under the MIT License. See LICENSE file for license information.
+# ---------------------------------------------------------------------------
+# Bases on the work by 'maelvls'
+# https://github.com/microsoft/vscode-pull-request-github/issues/2564#issuecomment-873408060
+
+
+trace() {
+  printf "\033[33m%s\033[0m %s\n" "$1" "${*:2}"
+  "$@"
+}
+
+CURRENT_BRANCH=$(git branch --show-current)
+PR_OWNER_NUMBER=$(gh pr view --json url | jq -r .url | sed 's@https://github.com/@@; s@/pull/@#@; s@/@#@g')
+PR_NUMBER=$(echo $PR_OWNER_NUMBER | sed 's@.*#@@')
+AUTHOR=$(gh pr view --json author | jq -r .author.login)
+
+# Add named remote
+if git config "branch.$CURRENT_BRANCH.remote" | grep -q '^https://github.com\|^git@github.com'; then
+    trace git remote add "$AUTHOR" "$(git config branch.$CURRENT_BRANCH.remote)"
+    trace git config "branch.$CURRENT_BRANCH.remote" "$AUTHOR"
+
+    # Rename branch
+    if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
+        trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
+    fi
+fi
+
+# Fetch branch
+CURRENT_BRANCH=$(git branch --show-current)
+HEAD=$(git config branch.$CURRENT_BRANCH.merge | sed 's@refs/heads/@@')
+
+if [[ $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
+    trace git fetch "$AUTHOR" "$HEAD"
+fi
