@@ -19,6 +19,8 @@ AUTHOR=$(gh pr view --json author | jq -r .author.login)
 # Add github-pr-owner-number
 if [[ -n "$PR_OWNER_NUMBER" ]]; then
     trace git config "branch.$CURRENT_BRANCH.github-pr-owner-number" "$PR_OWNER_NUMBER"
+else
+    exit 1
 fi
 
 # Add named remote
