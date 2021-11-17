@@ -27,11 +27,11 @@ fi
 if git config "branch.$CURRENT_BRANCH.remote" | grep -q '^https://github.com\|^git@github.com'; then
     trace git remote add "$AUTHOR" "$(git config branch.$CURRENT_BRANCH.remote)"
     trace git config "branch.$CURRENT_BRANCH.remote" "$AUTHOR"
+fi
 
-    # Rename branch
-    if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
-        trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
-    fi
+# Rename branch
+if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
+    trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
 fi
 
 # Fetch branch
