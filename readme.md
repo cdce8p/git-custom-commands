@@ -18,6 +18,13 @@ git vsc
 git vsc-delete
 ```
 
+## Git config
+Set `push.default = upstream` to target the correct branch when using `git push`.
+https://git-scm.com/docs/git-config#Documentation/git-config.txt-pushdefault
+```bash
+git push.default upstream
+```
+
 ## How to
 - Create new file in `bin`
 - `chmod +x <file>`
