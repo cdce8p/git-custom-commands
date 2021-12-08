@@ -14,6 +14,9 @@ gh pr checkout 1234
 # Rename branch to 'pr/<author>/<pr_number>
 git vsc
 
+# Both can also be combined
+git vc 1234
+
 # Remove branch and remote
 git vsc-delete
 ```
