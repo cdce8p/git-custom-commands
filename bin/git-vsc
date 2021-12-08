@@ -27,6 +27,8 @@ fi
 if git config "branch.$CURRENT_BRANCH.remote" | grep -q '^https://github.com\|^git@github.com'; then
     trace git remote add "$AUTHOR" "$(git config branch.$CURRENT_BRANCH.remote)"
     trace git config "branch.$CURRENT_BRANCH.remote" "$AUTHOR"
+    # Remove pushRemote entry - not necessary
+    trace git config --unset "branch.$CURRENT_BRANCH.pushRemote"
 fi
 
 # Rename branch
