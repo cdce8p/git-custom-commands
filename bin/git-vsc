@@ -37,8 +37,9 @@ fi
 # Fetch branch
 CURRENT_BRANCH=$(git branch --show-current)
 HEAD=$(git config branch.$CURRENT_BRANCH.merge | sed 's@refs/heads/@@')
+REMOTE=$(git config branch.$CURRENT_BRANCH.remote)
 
 if [[ $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
-    trace git fetch "$AUTHOR" "$HEAD"
+    trace git fetch "$REMOTE" "$HEAD"
     trace git merge --ff-only
 fi
