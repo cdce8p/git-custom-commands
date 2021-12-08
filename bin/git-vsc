@@ -12,31 +12,39 @@ trace() {
 }
 
 CURRENT_BRANCH=$(git branch --show-current)
-PR_OWNER_NUMBER=$(gh pr view --json url | jq -r .url | sed 's@https://github.com/@@; s@/pull/@#@; s@/@#@g')
-PR_NUMBER=$(echo $PR_OWNER_NUMBER | sed 's@.*#@@')
-AUTHOR=$(gh pr view --json author | jq -r .author.login)
 
-# Add github-pr-owner-number
-if [[ -n "$PR_OWNER_NUMBER" ]]; then
-    trace git config "branch.$CURRENT_BRANCH.github-pr-owner-number" "$PR_OWNER_NUMBER"
-else
-    exit 1
-fi
 
-# Add named remote
-if git config "branch.$CURRENT_BRANCH.remote" | grep -q '^https://github.com\|^git@github.com'; then
-    trace git remote add "$AUTHOR" "$(git config branch.$CURRENT_BRANCH.remote)"
-    trace git config "branch.$CURRENT_BRANCH.remote" "$AUTHOR"
-    # Remove pushRemote entry - not necessary
-    trace git config --unset "branch.$CURRENT_BRANCH.pushRemote"
-fi
-
-# Rename branch
+# Check if branch needs to be configured
 if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
-    trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
+    PR_OWNER_NUMBER=$(gh pr view --json url | jq -r .url | sed 's@https://github.com/@@; s@/pull/@#@; s@/@#@g')
+    PR_NUMBER=$(echo $PR_OWNER_NUMBER | sed 's@.*#@@')
+    AUTHOR=$(gh pr view --json author | jq -r .author.login)
+
+    # Add github-pr-owner-number
+    if [[ -n "$PR_OWNER_NUMBER" ]]; then
+        trace git config "branch.$CURRENT_BRANCH.github-pr-owner-number" "$PR_OWNER_NUMBER"
+    else
+        exit 1
+    fi
+
+    # Add named remote
+    if git config "branch.$CURRENT_BRANCH.remote" | grep -q '^https://github.com\|^git@github.com'; then
+        trace git remote add "$AUTHOR" "$(git config branch.$CURRENT_BRANCH.remote)"
+        trace git config "branch.$CURRENT_BRANCH.remote" "$AUTHOR"
+        # Remove pushRemote entry - not necessary
+        trace git config --unset "branch.$CURRENT_BRANCH.pushRemote"
+    fi
+
+    # Rename branch
+    if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
+        trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
+    fi
+else
+    echo "Branch configured already";
 fi
 
-# Fetch branch
+
+# Fetch and merge branch
 CURRENT_BRANCH=$(git branch --show-current)
 HEAD=$(git config branch.$CURRENT_BRANCH.merge | sed 's@refs/heads/@@')
 REMOTE=$(git config branch.$CURRENT_BRANCH.remote)
