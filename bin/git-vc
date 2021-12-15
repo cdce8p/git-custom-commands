@@ -4,6 +4,7 @@
 # ---------------------------------------------------------------------------
 
 echo "Try to checkout PR $1"
-if $(gh pr checkout $1); then
+gh pr checkout $1
+if [ $? -eq 0 ]; then
     git vsc
 fi
