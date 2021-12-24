@@ -40,7 +40,7 @@ if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
         trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
     fi
 else
-    echo "Branch configured already";
+    echo "Branch already configured";
 fi
 
 
