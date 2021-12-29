@@ -4,7 +4,28 @@
 # ---------------------------------------------------------------------------
 
 echo "Try to checkout PR $1"
-gh pr checkout $1
+
+
+# Check if PR number is valid
+AUTHOR=$(gh pr view $1 --json author)
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+AUTHOR=$(echo $AUTHOR | jq -r .author.login)
+
+
+# Check if branch already exists
+git config --get-regex "branch.pr/$AUTHOR/$1.*" > /dev/null
+
+if [ $? -eq 1 ]; then
+    gh pr checkout $1
+else
+    echo "Branch does already exist"
+    git checkout "pr/$AUTHOR/$1"
+fi
+
+
+# Run cmd to fetch and merge upstream changes
 if [ $? -eq 0 ]; then
     git vsc
 fi
