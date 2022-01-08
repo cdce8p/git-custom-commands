@@ -35,9 +35,8 @@ if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
         trace git config --unset "branch.$CURRENT_BRANCH.pushRemote"
     fi
 
-    # Rename branch except if remote is origin
-    if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') \
-            && $(git config "branch.$CURRENT_BRANCH.remote") != "origin" ]]; then
+    # Rename branch
+    if [[ ! $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
         trace git branch -m "$CURRENT_BRANCH" "pr/$AUTHOR/$PR_NUMBER"
     fi
 else
