@@ -52,5 +52,9 @@ REMOTE=$(git config branch.$CURRENT_BRANCH.remote)
 
 if [[ $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') || "$REMOTE" == "origin" ]]; then
     trace git fetch "$REMOTE" "$HEAD"
-    trace git merge --ff-only
+    if [[ "$1" == "-f" || "$1" == "--force" ]]; then
+        trace git reset --hard "$REMOTE/$HEAD"
+    else
+        trace git merge --ff-only
+    fi
 fi
