@@ -19,7 +19,9 @@ if [[ $(echo "$CURRENT_BRANCH" | grep '^pr\/.\+\/\d\+$') ]]; then
   if [[ $(git switch $MAIN_BRANCH) ]]; then
     trace git branch -D "$CURRENT_BRANCH"
     ALL_BRANCHES_REMOTE=$(git config --get-regex 'branch\..*\.remote')
-    if [[ ! $(git config --get-regex 'branch\..*\.remote' | grep "$REMOTE") && $REMOTE != 'upstream' ]]; then
+    if [[ "$1" == "--keep-remote" ]]; then
+      printf "Keep remote\n"
+    elif [[ ! $(git config --get-regex 'branch\..*\.remote' | grep "$REMOTE") && $REMOTE != 'upstream' ]]; then
       trace git remote remove "$REMOTE"
     fi
   else
